@@ -42,8 +42,7 @@ class FirebaseUserReloader {
       _onAuthStateChangedOrReloaded;
 
   static _setOnAuthStateChangedOrReloaded(Stream<FirebaseUser> steam) {
-    _onAuthStateChangedOrReloaded =
-        Rx.merge([steam, onUserReloaded]);
+    _onAuthStateChangedOrReloaded = Rx.merge([steam, onUserReloaded]);
   }
 
   /// Reloads the current [FirebaseUser], using an optional predicate to decide
