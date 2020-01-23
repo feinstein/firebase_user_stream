@@ -1,9 +1,8 @@
 name: firebase_user_stream
 description: >
-  Package for subscribing to FirebaseUser reload updates. This package aims to provide a functionality
-  missing from the firebase_auth package, which is to be able to reload user data from the server and
-  get Stream updates with the new data.
-version: 0.1.0+1
+  This package aims to provide a functionality missing from firebase_auth, which is to be able to reload user data from
+  the server and get Stream updates with the new data.
+version: 0.1.0+2
 homepage: https://github.com/feinstein/firebase_user_stream
 repository: https://github.com/feinstein/firebase_user_stream
 
