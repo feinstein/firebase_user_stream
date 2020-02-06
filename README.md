@@ -98,3 +98,13 @@ FirebaseUserReloader.reloadCurrentUser((user) => user.isEmailVerified);
 
 subscription.cancel();
 ```
+## Testing
+
+This library uses `static` methods for easiness of usage, but this doesn't limit its 
+testability.
+
+`FirebaseUserReloader` can be injected with a mocked instance of `FirebaseAuth`, which 
+can then be used for unit testing.
+
+For any examples on how to control its behavior under tests, please take a loot at our 
+own tests inside the `test` folder.

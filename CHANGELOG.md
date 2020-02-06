@@ -1,3 +1,7 @@
+## 0.1.0+3
+
+* Added a Testability section to the README.
+
 ## 0.1.0+2
 
 * Made the description shorter.
