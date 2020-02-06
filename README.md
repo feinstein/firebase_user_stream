@@ -1,5 +1,7 @@
 # FirebaseUser Stream
 
+[![pub package](https://img.shields.io/pub/v/firebase_user_stream.svg)](https://pub.dartlang.org/packages/firebase_user_stream)
+
 A Package for subscribing to FirebaseUser reload updates.
 
 ## The problem
