@@ -1,3 +1,12 @@
+## 1.0.0-alpha
+
+* Fixed the onAuthStateChangedOrReloaded to be a broadcast Stream, as intended originally.
+* Added a `await` for the old user reload as this is more consistent and what's expected, even though it's not necessary, as reload is just a simple MethodChannel call.
+* Fixed a typo.
+* Updated the tests to check if onUserReloaded and onAuthStateChangedOrReloaded are broadcast streams.
+* Reformatted the tests.
+* Updated the README with information about broadcast streams.
+
 ## 0.1.0+4
 
 * Added a pub badge to the README.

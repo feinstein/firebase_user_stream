@@ -100,6 +100,9 @@ FirebaseUserReloader.reloadCurrentUser((user) => user.isEmailVerified);
 
 subscription.cancel();
 ```
+
+Both `onAuthStateChangedOrReloaded` and `onUserReloaded` are broadcast streams.
+
 ## Testing
 
 This library uses `static` methods for easiness of usage, but this doesn't limit its 
