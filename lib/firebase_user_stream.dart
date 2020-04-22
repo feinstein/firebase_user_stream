@@ -19,7 +19,8 @@ class FirebaseUserReloader {
   static set auth(FirebaseAuth value) {
     if (_auth != value) {
       _auth = value;
-      _setOnAuthStateChangedOrReloaded(_auth.onAuthStateChanged);
+      _onAuthStateChangedOrReloaded =
+          _mergeWithOnUserReloaded(_auth.onAuthStateChanged);
     }
   }
 
@@ -34,15 +35,16 @@ class FirebaseUserReloader {
       _userReloadedStreamController.stream;
 
   static Stream<FirebaseUser> _onAuthStateChangedOrReloaded =
-      Rx.merge([_auth.onAuthStateChanged, onUserReloaded]);
+      _mergeWithOnUserReloaded(_auth.onAuthStateChanged);
 
   /// Receive [FirebaseUser] each time the user signIn, signOut or is reloaded
   /// by [reloadCurrentUser].
   static Stream<FirebaseUser> get onAuthStateChangedOrReloaded =>
       _onAuthStateChangedOrReloaded;
 
-  static _setOnAuthStateChangedOrReloaded(Stream<FirebaseUser> steam) {
-    _onAuthStateChangedOrReloaded = Rx.merge([steam, onUserReloaded]);
+  /// Merges the given [Stream] with [onUserReloaded] as a broadcast [Stream].
+  static Stream<FirebaseUser> _mergeWithOnUserReloaded(Stream<FirebaseUser> stream) {
+    return Rx.merge([stream, onUserReloaded]).asBroadcastStream();
   }
 
   /// Reloads the current [FirebaseUser], using an optional predicate to decide
@@ -69,7 +71,7 @@ class FirebaseUserReloader {
       [EmissionPredicate predicate]) async {
     FirebaseUser oldUser = await auth.currentUser();
     // we need to first reload to the get the updated data.
-    oldUser.reload();
+    await oldUser.reload();
     FirebaseUser newUser = await auth.currentUser();
 
     if (predicate == null || predicate(newUser)) {

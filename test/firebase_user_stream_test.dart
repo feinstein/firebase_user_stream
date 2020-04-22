@@ -40,7 +40,6 @@ void main() {
 
     test('Reloads returns the new User', () async {
       var user = await FirebaseUserReloader.reloadCurrentUser();
-
       expect(user, equals(mockNewUser));
     });
 
@@ -67,21 +66,26 @@ void main() {
       await subscription.cancel();
     });
 
-    test('Reloads emits the new User in onAuthStateChangedOrReloaded',
-        () async {
+    test('Reloads emits the new User in onAuthStateChangedOrReloaded', () async {
       expect(FirebaseUserReloader.onAuthStateChangedOrReloaded,
           emitsInOrder([mockOldUser, mockNewUser]));
       await FirebaseUserReloader.reloadCurrentUser();
     });
 
-    test('Current user is emmited when subscribing to '
-         'onAuthStateChangedOrReloaded',
-            () async {
-          expect(FirebaseUserReloader.onAuthStateChangedOrReloaded,
-              emits(mockOldUser));
-        });
+    test('Current user is emmited when subscribing to onAuthStateChangedOrReloaded', () {
+      expect(FirebaseUserReloader.onAuthStateChangedOrReloaded, emits(mockOldUser));
+    });
+
+    test('Allow many subscribers to the onUserReloaded Stream', () {
+      expect(FirebaseUserReloader.onUserReloaded.isBroadcast, true);
+    });
+
+    test('Allow many subscribers to the onAuthStateChangedOrReloaded Stream', () {
+      expect(FirebaseUserReloader.onAuthStateChangedOrReloaded.isBroadcast, true);
+    });
   });
 }
 
 class MockFirebaseAuth extends Mock implements FirebaseAuth {}
+
 class MockFirebaseUser extends Mock implements FirebaseUser {}
