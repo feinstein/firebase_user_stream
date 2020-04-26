@@ -77,11 +77,11 @@ void main() {
     });
 
     test('Allow many subscribers to the onUserReloaded Stream', () {
-      expect(FirebaseUserReloader.onUserReloaded.isBroadcast, true);
+      expect(FirebaseUserReloader.onUserReloaded.isBroadcast, isTrue);
     });
 
     test('Allow many subscribers to the onAuthStateChangedOrReloaded Stream', () {
-      expect(FirebaseUserReloader.onAuthStateChangedOrReloaded.isBroadcast, true);
+      expect(FirebaseUserReloader.onAuthStateChangedOrReloaded.isBroadcast, isTrue);
     });
   });
 }

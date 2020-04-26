@@ -1,3 +1,9 @@
+## 1.0.0-alpha.2
+
+* Changed the `onAuthStateChangedOrReloaded` to be a Behavior Subject.
+* Minor modification on the tests.
+* Improved the README.
+
 ## 1.0.0-alpha
 
 * Fixed the onAuthStateChangedOrReloaded to be a broadcast Stream, as intended originally.

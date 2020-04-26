@@ -44,7 +44,7 @@ class FirebaseUserReloader {
 
   /// Merges the given [Stream] with [onUserReloaded] as a broadcast [Stream].
   static Stream<FirebaseUser> _mergeWithOnUserReloaded(Stream<FirebaseUser> stream) {
-    return Rx.merge([stream, onUserReloaded]).asBroadcastStream();
+    return Rx.merge([stream, onUserReloaded]).shareValue();
   }
 
   /// Reloads the current [FirebaseUser], using an optional predicate to decide
@@ -70,7 +70,7 @@ class FirebaseUserReloader {
   static Future<FirebaseUser> reloadCurrentUser(
       [EmissionPredicate predicate]) async {
     FirebaseUser oldUser = await auth.currentUser();
-    // we need to first reload to the get the updated data.
+    // we need to first reload to then get the updated data.
     await oldUser.reload();
     FirebaseUser newUser = await auth.currentUser();
 

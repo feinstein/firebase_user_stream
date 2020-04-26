@@ -40,8 +40,13 @@ Future<FirebaseUser> reloadCurrentUser() async {
 ## Getting Started
 
 After you install this package you can use `FirebaseUserReloader` to get reload updates 
-using `onUserReloaded` or `onAuthStateChangedOrReloaded`, it's pretty simple. In order
-to get reload updates just do:
+using the `onUserReloaded` and `onAuthStateChangedOrReloaded` streams. 
+
+`FirebaseUserReloader` internally uses the 
+`FirebaseAuth` instance returned by `FirebaseAuth.instance`, so your entire App will have the same
+[Singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance, you don't have to configure anything, it just works out of the box.
+
+In order to get reload updates just do:
 
 ```dart
 var subscription = FirebaseUserReloader.onUserReloaded.listen((user) {
@@ -86,7 +91,7 @@ var user = await FirebaseUserReloader.reloadCurrentUser();
 
 If you want to listen for updates on sign-ins, sign-outs and user reloads, use 
 `onAuthStateChangedOrReloaded` instead, it's just a convenient merge of `onUserReloaded` and
-`FirebaseAuth.onAuthStateChanged`:
+`FirebaseAuth.onAuthStateChanged` and it works as a [Behavior Subject](https://pub.dev/documentation/rxdart/latest/rx/BehaviorSubject-class.html):
 
 ```dart
 var subscription = FirebaseUserReloader.onAuthStateChangedOrReloaded.listen((user) {
@@ -111,5 +116,5 @@ testability.
 `FirebaseUserReloader` can be injected with a mocked instance of `FirebaseAuth`, which 
 can then be used for unit testing.
 
-For any examples on how to control its behavior under tests, please take a loot at our 
+For any examples on how to control its behavior under tests, please take a look at our 
 own tests inside the `test` folder.
