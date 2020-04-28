@@ -91,7 +91,7 @@ var user = await FirebaseUserReloader.reloadCurrentUser();
 
 If you want to listen for updates on sign-ins, sign-outs and user reloads, use 
 `onAuthStateChangedOrReloaded` instead, it's just a convenient merge of `onUserReloaded` and
-`FirebaseAuth.onAuthStateChanged` and it works as a [Behavior Subject](https://pub.dev/documentation/rxdart/latest/rx/BehaviorSubject-class.html):
+`FirebaseAuth.onAuthStateChanged` and it works as a broadcast [Behavior Subject](https://pub.dev/documentation/rxdart/latest/rx/BehaviorSubject-class.html):
 
 ```dart
 var subscription = FirebaseUserReloader.onAuthStateChangedOrReloaded.listen((user) {

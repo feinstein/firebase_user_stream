@@ -44,7 +44,7 @@ class FirebaseUserReloader {
 
   /// Merges the given [Stream] with [onUserReloaded] as a broadcast [Stream].
   static Stream<FirebaseUser> _mergeWithOnUserReloaded(Stream<FirebaseUser> stream) {
-    return Rx.merge([stream, onUserReloaded]).shareValue();
+    return Rx.merge([stream, onUserReloaded]).publishValue()..connect();
   }
 
   /// Reloads the current [FirebaseUser], using an optional predicate to decide

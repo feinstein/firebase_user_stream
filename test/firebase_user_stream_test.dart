@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -15,6 +17,8 @@ void main() {
     MockFirebaseUser mockOldUser;
 
     MockFirebaseUser currentUser;
+
+    StreamSubscription<FirebaseUser> subscription;
 
     setUp(() {
       mockOldUser = MockFirebaseUser();
@@ -56,24 +60,31 @@ void main() {
 
     test('Reloads does not emit the new User when predicate is false in '
          'onUserReloaded', () async {
-      var subscription = FirebaseUserReloader.onUserReloaded.listen((_) {
+      subscription = FirebaseUserReloader.onUserReloaded.listen((_) {
         fail('Should not emit');
       });
 
       // Doesn't emit
       await FirebaseUserReloader.reloadCurrentUser((_) => false);
       await Future.delayed(const Duration(milliseconds: 500));
-      await subscription.cancel();
     });
 
     test('Reloads emits the new User in onAuthStateChangedOrReloaded', () async {
-      expect(FirebaseUserReloader.onAuthStateChangedOrReloaded,
-          emitsInOrder([mockOldUser, mockNewUser]));
+      final List<FirebaseUser> expected = [mockOldUser, mockNewUser];
+      int i = 0;
+
+      subscription = FirebaseUserReloader.onAuthStateChangedOrReloaded.listen(expectAsync1(
+        (user) => expect(user, expected[i++]),
+        count: expected.length,
+      ));
+
       await FirebaseUserReloader.reloadCurrentUser();
     });
 
-    test('Current user is emmited when subscribing to onAuthStateChangedOrReloaded', () {
-      expect(FirebaseUserReloader.onAuthStateChangedOrReloaded, emits(mockOldUser));
+    test('Current user is emitted when subscribing to onAuthStateChangedOrReloaded', () {
+      subscription = FirebaseUserReloader.onAuthStateChangedOrReloaded.listen(
+        expectAsync1((user) => expect(user, mockOldUser)),
+      );
     });
 
     test('Allow many subscribers to the onUserReloaded Stream', () {
@@ -83,6 +94,32 @@ void main() {
     test('Allow many subscribers to the onAuthStateChangedOrReloaded Stream', () {
       expect(FirebaseUserReloader.onAuthStateChangedOrReloaded.isBroadcast, isTrue);
     });
+
+    test('onAuthStateChangedOrReloaded never shuts down, '
+         'even if all listeners disconnect', () async {
+      int i = 0;
+
+      subscription = FirebaseUserReloader.onAuthStateChangedOrReloaded.listen(
+        (_) => i++,
+      );
+
+      await FirebaseUserReloader.reloadCurrentUser();
+
+      while (i < 2) {
+        // necessary to get the stream async emissions.
+        await Future.microtask(() {});
+      }
+
+      subscription?.cancel();
+
+      subscription = FirebaseUserReloader.onAuthStateChangedOrReloaded.listen(
+        expectAsync1((user) => expect(user, mockNewUser), count: 2),
+      );
+
+      await FirebaseUserReloader.reloadCurrentUser();
+    });
+
+    tearDown(() => subscription?.cancel());
   });
 }
 

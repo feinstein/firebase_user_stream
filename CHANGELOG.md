@@ -1,3 +1,9 @@
+## 1.0.0-alpha.3
+
+* Changed the `onAuthStateChangedOrReloaded` to never shutdown, even if all listeners disconnect, so new listeners in the future can still subscribe.
+* Modified the tests to include `onAuthStateChangedOrReloaded` new behavior.
+* Improved the README.
+
 ## 1.0.0-alpha.2
 
 * Changed the `onAuthStateChangedOrReloaded` to be a Behavior Subject.
