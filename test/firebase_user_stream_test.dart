@@ -95,6 +95,7 @@ void main() {
       expect(FirebaseUserReloader.onAuthStateChangedOrReloaded.isBroadcast, isTrue);
     });
 
+    // good tips on how to test streams: https://github.com/dart-lang/stream_transform/blob/06a0740059e0595694b61b27342b7aad85123a3f/test/merge_test.dart#L54-L74
     test('onAuthStateChangedOrReloaded never shuts down, '
          'even if all listeners disconnect', () async {
       int i = 0;
@@ -107,7 +108,7 @@ void main() {
 
       while (i < 2) {
         // necessary to get the stream async emissions.
-        await Future.microtask(() {});
+        await Future(() {});
       }
 
       subscription?.cancel();
@@ -119,7 +120,7 @@ void main() {
       await FirebaseUserReloader.reloadCurrentUser();
     });
 
-    tearDown(() => subscription?.cancel());
+    tearDown(() async => await subscription?.cancel());
   });
 }
 

@@ -1,3 +1,8 @@
+## 1.0.0
+
+* First stable release.
+* Made some small adjustments to the tests.
+
 ## 1.0.0-alpha.3
 
 * Changed the `onAuthStateChangedOrReloaded` to never shutdown, even if all listeners disconnect, so new listeners in the future can still subscribe.
