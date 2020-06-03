@@ -55,7 +55,12 @@ void main() {
     test('Reloads emits the new User when predicate is true in onUserReloaded',
         () async {
       expect(FirebaseUserReloader.onUserReloaded, emits(mockNewUser));
-      await FirebaseUserReloader.reloadCurrentUser((_) => true);
+      await FirebaseUserReloader.reloadCurrentUser(predicate: (_) => true);
+    });
+
+    test('Reloads emits the new User when given oldUser in onUserReloaded', () async {
+      expect(FirebaseUserReloader.onUserReloaded, emits(mockNewUser));
+      await FirebaseUserReloader.reloadCurrentUser(oldUser: mockOldUser);
     });
 
     test('Reloads does not emit the new User when predicate is false in '
@@ -65,7 +70,7 @@ void main() {
       });
 
       // Doesn't emit
-      await FirebaseUserReloader.reloadCurrentUser((_) => false);
+      await FirebaseUserReloader.reloadCurrentUser(predicate: (_) => false);
       await Future.delayed(const Duration(milliseconds: 500));
     });
 

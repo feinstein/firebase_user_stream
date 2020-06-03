@@ -43,14 +43,16 @@ class FirebaseUserReloader {
       _onAuthStateChangedOrReloaded;
 
   /// Merges the given [Stream] with [onUserReloaded] as a broadcast [Stream].
-  static Stream<FirebaseUser> _mergeWithOnUserReloaded(Stream<FirebaseUser> stream) {
+  static Stream<FirebaseUser> _mergeWithOnUserReloaded(
+      Stream<FirebaseUser> stream) {
     return Rx.merge([stream, onUserReloaded]).publishValue()..connect();
   }
 
-  /// Reloads the current [FirebaseUser], using an optional predicate to decide
+  /// Reloads the current [FirebaseUser], using an optional [predicate] to decide
   /// if the reloaded [FirebaseUser] should be emitted by [onUserReloaded] or
   /// not. If a predicate isn't provided the reloaded [FirebaseUser] will
-  /// always be emitted.
+  /// always be emitted. An optional [oldUser] is also given, if you already
+  /// have this.
   ///
   /// The reloaded [FirebaseUser] will always be returned, independently of the
   /// predicate's result.
@@ -64,12 +66,16 @@ class FirebaseUserReloader {
   /// });
   ///
   /// // Calling this will print the user, if its email has been verified.
-  /// await FirebaseUserReloader.reloadCurrentUser(FirebaseAuth.instance,
-  ///     (user) => user.isEmailVerified);
+  /// await FirebaseUserReloader.reloadCurrentUser(
+  ///     predicate: (user) => user.isEmailVerified);
   /// ```
-  static Future<FirebaseUser> reloadCurrentUser(
-      [EmissionPredicate predicate]) async {
-    FirebaseUser oldUser = await auth.currentUser();
+  static Future<FirebaseUser> reloadCurrentUser({
+    EmissionPredicate predicate,
+    FirebaseUser oldUser,
+  }) async {
+    if (oldUser == null) {
+      oldUser = await auth.currentUser();
+    }
     // we need to first reload to then get the updated data.
     await oldUser.reload();
     FirebaseUser newUser = await auth.currentUser();

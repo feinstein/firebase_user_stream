@@ -14,5 +14,5 @@ void main() {
   });
 
   FirebaseUserReloader.reloadCurrentUser();
-  FirebaseUserReloader.reloadCurrentUser((user) => user.isEmailVerified);
+  FirebaseUserReloader.reloadCurrentUser(predicate: (user) => user.isEmailVerified);
 }

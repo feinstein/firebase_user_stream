@@ -77,7 +77,7 @@ var subscription = FirebaseUserReloader.onUserReloaded.listen((user) {
 
 // This will trigger a reload and the reloaded user will be emitted by onUserReloaded
 // only if isEmailVerified == true
-FirebaseUserReloader.reloadCurrentUser((user) => user.isEmailVerified);
+FirebaseUserReloader.reloadCurrentUser(predicate: (user) => user.isEmailVerified);
 
 subscription.cancel();
 ```
@@ -87,7 +87,15 @@ the predicate will be ignored and the reloaded user will always be returned.
 
 ```dart
 var user = await FirebaseUserReloader.reloadCurrentUser();
- ```
+```
+
+If you already have the `oldUser`, you can pass it as a named parameter to `reloadCurrentUser`.
+
+
+```dart
+var user = await FirebaseUserReloader.reloadCurrentUser(oldUser: oldUser);
+```
+
 
 If you want to listen for updates on sign-ins, sign-outs and user reloads, use 
 `onAuthStateChangedOrReloaded` instead, it's just a convenient merge of `onUserReloaded` and
@@ -101,7 +109,7 @@ var subscription = FirebaseUserReloader.onAuthStateChangedOrReloaded.listen((use
 
 // This will trigger a reload and the reloaded user will be emitted by onUserReloaded
 // only if isEmailVerified == true
-FirebaseUserReloader.reloadCurrentUser((user) => user.isEmailVerified);
+FirebaseUserReloader.reloadCurrentUser(predicate: (user) => user.isEmailVerified);
 
 subscription.cancel();
 ```
