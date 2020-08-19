@@ -10,52 +10,58 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:rxdart/rxdart.dart';
 
-typedef EmissionPredicate = bool Function(FirebaseUser user);
+typedef EmissionPredicate = bool Function(User user);
 
 class FirebaseUserReloader {
-  static FirebaseAuth _auth = FirebaseAuth.instance;
+  static FirebaseAuth _auth;
+
+  static FirebaseAuth get auth {
+    if (_auth == null) {
+      _auth = FirebaseAuth.instance;
+    }
+
+    return _auth;
+  }
 
   @visibleForTesting
   static set auth(FirebaseAuth value) {
     if (_auth != value) {
       _auth = value;
       _onAuthStateChangedOrReloaded =
-          _mergeWithOnUserReloaded(_auth.onAuthStateChanged);
+          _mergeWithOnUserReloaded(_auth.authStateChanges());
     }
   }
 
-  static FirebaseAuth get auth => _auth;
+  static final StreamController<User> _userReloadedStreamController =
+      StreamController<User>.broadcast();
 
-  static final StreamController<FirebaseUser> _userReloadedStreamController =
-      StreamController<FirebaseUser>.broadcast();
-
-  /// Receive a [FirebaseUser] each time the user is reloaded by
+  /// Receive a [User] each time the user is reloaded by
   /// [reloadCurrentUser].
-  static Stream<FirebaseUser> get onUserReloaded =>
+  static Stream<User> get onUserReloaded =>
       _userReloadedStreamController.stream;
 
-  static Stream<FirebaseUser> _onAuthStateChangedOrReloaded =
-      _mergeWithOnUserReloaded(_auth.onAuthStateChanged);
+  static Stream<User> _onAuthStateChangedOrReloaded =
+      _mergeWithOnUserReloaded(_auth.authStateChanges());
 
-  /// Receive [FirebaseUser] each time the user signIn, signOut or is reloaded
+  /// Receive [User] each time the user signIn, signOut or is reloaded
   /// by [reloadCurrentUser].
-  static Stream<FirebaseUser> get onAuthStateChangedOrReloaded =>
+  static Stream<User> get onAuthStateChangedOrReloaded =>
       _onAuthStateChangedOrReloaded;
 
   /// Merges the given [Stream] with [onUserReloaded] as a broadcast [Stream].
-  static Stream<FirebaseUser> _mergeWithOnUserReloaded(Stream<FirebaseUser> stream) {
+  static Stream<User> _mergeWithOnUserReloaded(Stream<User> stream) {
     return Rx.merge([stream, onUserReloaded]).publishValue()..connect();
   }
 
-  /// Reloads the current [FirebaseUser], using an optional predicate to decide
-  /// if the reloaded [FirebaseUser] should be emitted by [onUserReloaded] or
-  /// not. If a predicate isn't provided the reloaded [FirebaseUser] will
+  /// Reloads the current [User], using an optional predicate to decide
+  /// if the reloaded [User] should be emitted by [onUserReloaded] or
+  /// not. If a predicate isn't provided the reloaded [User] will
   /// always be emitted.
   ///
-  /// The reloaded [FirebaseUser] will always be returned, independently of the
+  /// The reloaded [User] will always be returned, independently of the
   /// predicate's result.
   ///
-  /// Example for getting updates only when [FirebaseUser.isEmailVerified]
+  /// Example for getting updates only when [User.emailVerified]
   /// is true:
   ///
   /// ```dart
@@ -65,14 +71,14 @@ class FirebaseUserReloader {
   ///
   /// // Calling this will print the user, if its email has been verified.
   /// await FirebaseUserReloader.reloadCurrentUser(FirebaseAuth.instance,
-  ///     (user) => user.isEmailVerified);
+  ///     (user) => user.emailVerified);
   /// ```
-  static Future<FirebaseUser> reloadCurrentUser(
+  static Future<User> reloadCurrentUser(
       [EmissionPredicate predicate]) async {
-    FirebaseUser oldUser = await auth.currentUser();
+    User oldUser = auth.currentUser;
     // we need to first reload to then get the updated data.
     await oldUser.reload();
-    FirebaseUser newUser = await auth.currentUser();
+    User newUser = auth.currentUser;
 
     if (predicate == null || predicate(newUser)) {
       _userReloadedStreamController.add(newUser);

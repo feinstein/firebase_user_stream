@@ -1,3 +1,6 @@
+## 1.1.0-alpha
+* Updated to match firebase_auth v0.18.0.
+
 ## 1.0.0
 
 * First stable release.

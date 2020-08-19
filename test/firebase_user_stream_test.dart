@@ -13,32 +13,31 @@ import 'package:mockito/mockito.dart';
 void main() {
   group('FirebaseUserReloader', () {
     MockFirebaseAuth mockAuth;
-    MockFirebaseUser mockNewUser;
-    MockFirebaseUser mockOldUser;
+    MockUser mockNewUser;
+    MockUser mockOldUser;
 
-    MockFirebaseUser currentUser;
+    MockUser currentUser;
 
-    StreamSubscription<FirebaseUser> subscription;
+    StreamSubscription<User> subscription;
 
-    setUp(() {
-      mockOldUser = MockFirebaseUser();
-      mockNewUser = MockFirebaseUser();
+    setUp(() async {
+      mockOldUser = MockUser();
+      mockNewUser = MockUser();
+      currentUser = mockOldUser;
 
       when(mockOldUser.reload()).thenAnswer((_) async {
         currentUser = mockNewUser;
         return null;
       });
 
-      when(mockOldUser.isEmailVerified).thenReturn(false);
-      when(mockNewUser.isEmailVerified).thenReturn(true);
+      when(mockOldUser.emailVerified).thenReturn(false);
+      when(mockNewUser.emailVerified).thenReturn(true);
 
       mockAuth = MockFirebaseAuth();
-      when(mockAuth.currentUser())
-          .thenAnswer((_) => Future<FirebaseUser>.value(currentUser));
-      when(mockAuth.onAuthStateChanged)
-          .thenAnswer((_) => Stream<FirebaseUser>.value(mockOldUser));
+      when(mockAuth.currentUser).thenAnswer((_) => currentUser);
+      when(mockAuth.authStateChanges())
+          .thenAnswer((_) => Stream<User>.value(mockOldUser));
 
-      currentUser = mockOldUser;
       FirebaseUserReloader.auth = mockAuth;
     });
 
@@ -70,11 +69,11 @@ void main() {
     });
 
     test('Reloads emits the new User in onAuthStateChangedOrReloaded', () async {
-      final List<FirebaseUser> expected = [mockOldUser, mockNewUser];
+      final List<User> expected = [mockOldUser, mockNewUser];
       int i = 0;
 
       subscription = FirebaseUserReloader.onAuthStateChangedOrReloaded.listen(expectAsync1(
-        (user) => expect(user, expected[i++]),
+        (user) => expect(user, equals(expected[i++])),
         count: expected.length,
       ));
 
@@ -83,7 +82,7 @@ void main() {
 
     test('Current user is emitted when subscribing to onAuthStateChangedOrReloaded', () {
       subscription = FirebaseUserReloader.onAuthStateChangedOrReloaded.listen(
-        expectAsync1((user) => expect(user, mockOldUser)),
+        expectAsync1((user) => expect(user, equals(mockOldUser))),
       );
     });
 
@@ -114,7 +113,7 @@ void main() {
       subscription?.cancel();
 
       subscription = FirebaseUserReloader.onAuthStateChangedOrReloaded.listen(
-        expectAsync1((user) => expect(user, mockNewUser), count: 2),
+        expectAsync1((user) => expect(user, equals(mockNewUser)), count: 2),
       );
 
       await FirebaseUserReloader.reloadCurrentUser();
@@ -126,4 +125,4 @@ void main() {
 
 class MockFirebaseAuth extends Mock implements FirebaseAuth {}
 
-class MockFirebaseUser extends Mock implements FirebaseUser {}
+class MockUser extends Mock implements User {}

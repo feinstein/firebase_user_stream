@@ -1,10 +1,17 @@
-# FirebaseUser Stream
+# Firebase User Stream
 
 [![pub package](https://img.shields.io/pub/v/firebase_user_stream.svg)](https://pub.dartlang.org/packages/firebase_user_stream)
 
-A Package for subscribing to FirebaseUser reload updates.
+A Package for subscribing to User reload updates.
 
-## The problem
+# ATTENTION
+Since `firebase_auth` version 0.18.0 this library is mostly pointless as `firebase_auth` (finally) adds 
+`authStateChanges()` which mostly substitutes this package, fixing the problem described below.
+
+I mean mostly because here we can further functionality like: reloading based on a predicate, reload and get the user in 
+the same line, and have separate streams for authentication and user changes. Although that's not useful to most people.  
+
+## The (old, pre 0.18.0) problem
 The FirebaseAuth Flutter plugin provides a `Stream<FirebaseUser>` with 
 `onAuthStateChanged`, which is useful for getting updates when a user signs-in 
 or signs-out, but it fails to provide an update when the user data itself changes.
@@ -14,8 +21,8 @@ address, in other words get if `FirebaseUser.isEmailVerified` changed its value,
 this is updated server-side and not pushed to the app. 
 
 `FirebaseAuth.currentUser()` will only detect changes made locally to the user, but 
-if any changes are made server-side, it won't detect, unless `FirebaseUser.reload()`
-is called first and then we need to call `FirebaseAuth.currentUser()` again to get 
+if any server-side changes occur, it won't detect them, unless `FirebaseUser.reload()`
+is called first, then we need to call `FirebaseAuth.currentUser()` again to get 
 the reloaded user, but still this user won't be emitted by `onAuthStateChanged`.
 
 ## The solution
@@ -83,7 +90,7 @@ subscription.cancel();
 ```
 
 You also can get the reloaded user as the return value of `reloadCurrentUser`, but in this case, 
-the predicate will be ignored and the reloaded user will always be returned.
+the predicate will be ignored, and the reloaded user will always be returned.
 
 ```dart
 var user = await FirebaseUserReloader.reloadCurrentUser();
@@ -113,8 +120,7 @@ Both `onAuthStateChangedOrReloaded` and `onUserReloaded` are broadcast streams.
 This library uses `static` methods for easiness of usage, but this doesn't limit its 
 testability.
 
-`FirebaseUserReloader` can be injected with a mocked instance of `FirebaseAuth`, which 
-can then be used for unit testing.
+`FirebaseUserReloader` can be injected with a mocked instance of `FirebaseAuth` for unit testing.
 
 For any examples on how to control its behavior under tests, please take a look at our 
 own tests inside the `test` folder.
