@@ -11,6 +11,14 @@ import 'package:firebase_user_stream/firebase_user_stream.dart';
 import 'package:mockito/mockito.dart';
 
 void main() {
+  group('Initialization', () {
+    test('Loads real FirebaseAuth.instance if no mocks were provided', () {
+      expect(
+          () => FirebaseUserReloader.onAuthStateChangedOrReloaded.listen((_) {}),
+          throwsA(isA<FirebaseException>()));
+    });
+  });
+
   group('FirebaseUserReloader', () {
     MockFirebaseAuth mockAuth;
     MockUser mockNewUser;

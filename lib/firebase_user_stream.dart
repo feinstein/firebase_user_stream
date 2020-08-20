@@ -7,7 +7,7 @@ library firebase_user_stream;
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
 typedef EmissionPredicate = bool Function(User user);
@@ -16,16 +16,13 @@ class FirebaseUserReloader {
   static FirebaseAuth _auth;
 
   static FirebaseAuth get auth {
-    if (_auth == null) {
-      _auth = FirebaseAuth.instance;
-    }
-
+    _auth ??= FirebaseAuth.instance;
     return _auth;
   }
 
   @visibleForTesting
   static set auth(FirebaseAuth value) {
-    if (_auth != value) {
+    if (_auth != value && value != null) {
       _auth = value;
       _onAuthStateChangedOrReloaded =
           _mergeWithOnUserReloaded(_auth.authStateChanges());
@@ -41,7 +38,7 @@ class FirebaseUserReloader {
       _userReloadedStreamController.stream;
 
   static Stream<User> _onAuthStateChangedOrReloaded =
-      _mergeWithOnUserReloaded(_auth.authStateChanges());
+      _mergeWithOnUserReloaded(auth.authStateChanges());
 
   /// Receive [User] each time the user signIn, signOut or is reloaded
   /// by [reloadCurrentUser].
