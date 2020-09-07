@@ -8,10 +8,14 @@ A Package for subscribing to User reload updates.
 Since `firebase_auth` version 0.18.0 this library is mostly pointless as `firebase_auth` (finally) adds 
 `authStateChanges()` which mostly substitutes this package, fixing the problem described below.
 
-I mean mostly because here we can further functionality like: reloading based on a predicate, reload and get the user in 
-the same line, and have separate streams for authentication and user changes. Although that's not useful to most people.  
+I mean mostly because here we can have further functionality like: 
 
-## The (old, pre 0.18.0) problem
+ * Reloading based on a predicate
+ * Reload and get the user in the same line. 
+
+Although that's not useful to most people.  
+
+## The (old, pre firebase_auth version 0.18.0) problem
 The FirebaseAuth Flutter plugin provides a `Stream<FirebaseUser>` with 
 `onAuthStateChanged`, which is useful for getting updates when a user signs-in 
 or signs-out, but it fails to provide an update when the user data itself changes.

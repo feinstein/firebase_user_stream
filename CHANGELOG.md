@@ -1,11 +1,9 @@
-## 1.1.0-alpha.2
+## 1.1.0
 
-* Fixed an initialization error.
-* Included an initialization test.
-
-## 1.1.0-alpha
-
-* Updated to match firebase_auth v0.18.0.
+* Update to match firebase_auth v0.18.0.
+* Fix initialization error.
+* Include initialization test.
+* Add Readme section explaining why this library isn't needed anymore.
 
 ## 1.0.0
 
